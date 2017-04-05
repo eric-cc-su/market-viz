@@ -15,4 +15,7 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
+.idea/
+marketviz_env/
+core/static/
+*.pyc

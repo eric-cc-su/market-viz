@@ -1,0 +1,22 @@
+{
+  "name": "marketviz",
+  "homepage": "https://github.com/eric-cc-su/market-viz",
+  "authors": [
+    "Eric <eric.cc.su@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "^15.4.2",
+    "jquery": "^3.2.1"
+  }
+}
