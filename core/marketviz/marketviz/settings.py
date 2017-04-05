@@ -124,11 +124,10 @@ PIPELINE = {
     'JAVASCRIPT': {
         'marketviz_js': {
             'source_filenames': (
-                'js/bower_components/jquery/dist/jquery.min.js',
+                'bower_components/jquery/dist/jquery.min.js',
                 # 'js/bower_components/react/JSXTransformer.js',
-                'js/bower_components/react/react-dom.js',
-                'js/bower_components/react/react-with-addons.js',
-                'js/app.browserify.js',
+                'bower_components/react/react-with-addons.js',
+                'js/index.browserify.js',
             ),
             'output_filename': 'js/marketviz_js.js',
         }
@@ -139,7 +138,7 @@ PIPELINE = {
                 'css/styles.css',
             },
             'output_filename': 'css/marketviz_css.css',
-        }
+        },
     },
     'COMPILERS': ('marketviz.compilers.BrowserifyCompiler', ),
    # 'CSS_COMPRESSOR': 'pipeline.compressors.NoopCompressor',
@@ -151,5 +150,5 @@ PIPELINE = {
 #     'pipeline_browserify.compiler.BrowserifyCompiler',
 # )
 
-# if DEBUG:
-#     PIPELINE['BROWSERIFY_ARGS'] = ['-t', 'babelify']
+if DEBUG:
+    PIPELINE['BROWSERIFY_ARGS'] = '-t [ babelify --presets [ es2015 react ] ]'.split()
