@@ -3,15 +3,49 @@
  */
 'use strict';
 
-import React from 'react'
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import QuoteTable from './quotetable'
 
-class App extends React.Component {
+class App extends Component {
     constructor(props) {
         super(props);
         this.state = {search: ''};
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    componentDidMount() {
+        const expectedRows = ['rank', 'symbol', 'name', 'last', 'percent_change'];
+        $.get('api/index', function(data) {
+            $('.loader').remove();
+            const tables = (<div>
+                <div className="col-sm-12">
+                    <h2>Most Active Quotes</h2>
+                    <div className="index-tables table-responsive">
+                        <QuoteTable columns={expectedRows} quotes={data['top_active']} key="top_active"/>
+                    </div>
+                </div>
+                <div className="col-sm-6">
+                    <h2>Winners</h2>
+                    <div className="index-tables table-responsive">
+                        <QuoteTable columns={expectedRows} quotes={data['top_gain']} key="top_gain" />
+                    </div>
+                </div>
+                <div className="col-sm-6 index-tables table-responsive">
+                    <h2>Losers</h2>
+                    <div className="index-tables table-responsive">
+                        <QuoteTable columns={expectedRows} quotes={data['top_lose']} key="top_lose"/>
+                    </div>
+                </div>
+            </div>);
+
+            ReactDOM.render(
+                tables,
+                document.getElementById('pagecontent')
+            );
+        });
     }
 
     handleInputChange(e) {
@@ -20,7 +54,7 @@ class App extends React.Component {
 
     handleSubmit(e) {
         e.preventDefault();
-        console.log("SUBMIT: ", this.state);
+        // console.log("SUBMIT: ", this.state);
         this.setState({'search': ''});
     }
 
@@ -52,8 +86,8 @@ class App extends React.Component {
                     </div>
                   </div>
                 </nav>
-                <div className="col-sm-12 page">
-
+                <div className="col-sm-12 page" id="pagecontent">
+                    <div className="loader"></div>
                 </div>
                 </div>
             </Router>

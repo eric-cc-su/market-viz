@@ -16,12 +16,20 @@ def make_request(url_suffix, payload=None, method="GET", format="json"):
                                                  auth=AUTH)
     return response
 
+# https://developers.tradeking.com/documentation/market-ext-quotes-get-post
 def get_quote(symbol):
     url = "market/ext/quotes"
     response = make_request(url, {"symbols": symbol})
-    return response.json()["response"]
+    return response.json()["response"]['quotes']['quote']
 
+# https://developers.tradeking.com/documentation/market-toplists-get
 def get_list(list):
     url = "market/toplists/" + list
     response = make_request(url)
-    return response.json()["response"]
+    quotes = response.json()["response"]['quotes']['quote']
+    for quote in quotes:
+        quote["change"] = quote.pop("chg")
+        quote["percent_change"] = quote.pop("pchg")
+        quote["prior_close"] = quote.pop("pcls")
+        quote["volume"] = quote.pop("vl")
+    return quotes
