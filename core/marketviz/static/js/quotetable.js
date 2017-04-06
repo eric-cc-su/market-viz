@@ -12,6 +12,13 @@ class QuoteTable extends Component {
             'quotes': props.quotes ? props.quotes : []
         };
         this.name = props.name;
+        this.handleRowClick = this.handleRowClick.bind(this)
+    }
+
+    handleRowClick(e) {
+        e.preventDefault();
+        console.log('click ROW!', e.currentTarget.dataset.symbol);
+        window.location = '/quote/'.concat(e.currentTarget.dataset.symbol);
     }
 
     render() {
@@ -34,8 +41,10 @@ class QuoteTable extends Component {
                     }</td>
                 );
             });
-            table_rows.push(<tr key={table_name + '_r_' + qindex}>{cells}</tr>);
-        });
+            table_rows.push(<tr key={table_name + '_r_' + qindex}
+                                data-symbol={quote['symbol']}
+                                onClick={this.handleRowClick}>{cells}</tr>);
+        }.bind(this));
 
         return (
             <table className={'table table-striped ' + (this.props.class ? this.props.class : '')}>

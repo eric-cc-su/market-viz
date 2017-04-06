@@ -71,7 +71,7 @@ def get_quote(symbol):
         if value == "volume":
             quote[value] = "{:,}".format(int(quote[value]))
         # Whole regex match
-        elif len(re.findall(r'[-\d\.]+', quote[value])) == 1:
+        elif len(re.findall(r'[-\d\.]+', quote[value])) == 1 and len(re.findall(r'[-\d\.]+', quote[value])[0]) == len(quote[value]):
             quote[value] = "{:,.2f}".format(float(quote[value]))
 
     return quote
