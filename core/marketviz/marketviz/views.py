@@ -10,5 +10,5 @@ def quote_view(request):
     data = {}
     if "symbol" in request.GET:
         response = get_quote(request.GET["symbol"])
-        data = response["response"]["quotes"]["quote"]
+        data = response["quotes"]["quote"]
     return Response(data)

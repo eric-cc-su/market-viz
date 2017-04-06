@@ -7,7 +7,7 @@ AUTH = OAuth1(CONSUMER_KEY, CONSUMER_SECRET,
               OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 API_URL = "https://api.tradeking.com/v1/"
 
-def make_request(url_suffix, payload, method="GET", format="json"):
+def make_request(url_suffix, payload=None, method="GET", format="json"):
     if format == "json":
         url_suffix += ".json"
     response = getattr(requests, method.lower())(API_URL + url_suffix,
@@ -16,7 +16,12 @@ def make_request(url_suffix, payload, method="GET", format="json"):
                                                  auth=AUTH)
     return response
 
-def get_quote(symbol, format="json"):
+def get_quote(symbol):
     url = "market/ext/quotes"
     response = make_request(url, {"symbols": symbol})
-    return getattr(response, format)() if format == "json" else getattr(response, format)
+    return response.json()["response"]
+
+def get_list(list):
+    url = "market/toplists/" + list
+    response = make_request(url)
+    return response.json()["response"]
