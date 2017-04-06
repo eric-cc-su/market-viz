@@ -2,6 +2,7 @@
  * Created by eric on 4/5/17.
  */
 import React, {Component} from 'react';
+import {capitalizePhrase} from './utils'
 
 class QuoteTable extends Component {
     constructor(props) {
@@ -11,21 +12,11 @@ class QuoteTable extends Component {
             'quotes': props.quotes ? props.quotes : []
         };
         this.name = props.name;
-        this.prepHeader = this.prepHeader.bind(this);
-    }
-
-    prepHeader(headerstring) {
-        headerstring = headerstring.replace('_', ' ');
-        var new_header = [];
-        headerstring.split(' ').map((substring) =>
-            new_header.push(substring.charAt(0).toUpperCase() + substring.slice(1))
-        );
-        return new_header.join(' ')
     }
 
     render() {
         const table_headers = this.state.columns.map((header, index) =>
-            <th key={index}>{this.prepHeader(header)}</th>
+            <th key={index}>{capitalizePhrase(header)}</th>
         );
         var theaders = this.state.columns;
         var table_name = this.name;

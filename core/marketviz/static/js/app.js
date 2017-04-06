@@ -6,6 +6,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Home from './home'
+import Quote from './quote'
 
 class App extends Component {
     constructor(props) {
@@ -37,7 +38,7 @@ class App extends Component {
                             <span className="icon-bar"></span>
                             <span className="icon-bar"></span>
                           </button>
-                          <a className="navbar-brand" href="#">Market Viz</a>
+                          <a className="navbar-brand" href="/">Market Viz</a>
                         </div>
 
                         <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -54,6 +55,7 @@ class App extends Component {
                     </nav>
 
                     <Route exact path="/" component={Home} />
+                    <Route path="/quote/:symbol" component={Quote} />
                 </div>
             </Router>
         );

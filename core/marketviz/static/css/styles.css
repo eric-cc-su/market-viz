@@ -1,11 +1,22 @@
 /* https://www.w3schools.com/howto/howto_css_loader.asp */
 
-.fa-arrow-down {
+.change-down, .fa-arrow-down {
     color: #d9534f;
 }
 
-.fa-arrow-up {
+.change-up, .fa-arrow-up {
     color: #5cb85c;
+}
+
+h2.quote-price {
+    display: inline-block;
+    margin-top: 0;
+}
+
+h3.quote-change {
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: 0;
 }
 
 .index-tables {

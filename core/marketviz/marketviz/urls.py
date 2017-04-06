@@ -21,6 +21,7 @@ from . import views
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', TemplateView.as_view(template_name="index.html")),
+    url(r'quote/(?P<symbol>([a-zA-Z0-9-]+))?$$', TemplateView.as_view(template_name="index.html")),
     url(r'api/index/$', views.index_data),
-    url(r'api/quote/$', views.quote_view),
+    url(r'api/quote$', views.quote_view),
 ]
