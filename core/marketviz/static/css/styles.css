@@ -1,4 +1,13 @@
 /* https://www.w3schools.com/howto/howto_css_loader.asp */
+
+.fa-arrow-down {
+    color: #d9534f;
+}
+
+.fa-arrow-up {
+    color: #5cb85c;
+}
+
 .index-tables {
     max-height: 450px;
 }

@@ -29,7 +29,13 @@ def get_list(list):
     quotes = response.json()["response"]['quotes']['quote']
     for quote in quotes:
         quote["change"] = quote.pop("chg")
+        direction = "u" if float(quote["change"]) > 0 else "d"
+        direction = "e" if float(quote["change"]) == 0 else direction
+        quote["chg_sign"] = direction
+        quote["price"] = "{:.2f}".format(float(quote.pop("last")))
         quote["percent_change"] = quote.pop("pchg")
+        if direction == "d":
+            quote["percent_change"] = "{:.2f}".format(-1 * float(quote["percent_change"]))
         quote["prior_close"] = quote.pop("pcls")
         quote["volume"] = quote.pop("vl")
     return quotes
