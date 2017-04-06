@@ -152,3 +152,8 @@ PIPELINE = {
 
 if DEBUG:
     PIPELINE['BROWSERIFY_ARGS'] = '-t [ babelify --presets [ es2015 react ] ]'.split()
+
+try:
+    from .env.local import *
+except ImportError:
+    pass

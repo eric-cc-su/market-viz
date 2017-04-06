@@ -19,3 +19,4 @@ yarn-error.log*
 marketviz_env/
 core/static/
 *.pyc
+core/marketviz/marketviz/env
