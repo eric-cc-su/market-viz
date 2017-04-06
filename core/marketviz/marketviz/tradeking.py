@@ -30,7 +30,7 @@ def get_quote(symbol):
         'exch_desc': 'exchange_desc',
         'hi': 'high',
         'iad': 'annual_dividend',
-        'incr_vl': 'last_trade_volumn',
+        'incr_vl': 'last_trade_volume',
         'last': 'last_trade_price',
         'lo': 'low',
         'name': 'name',
@@ -68,8 +68,12 @@ def get_quote(symbol):
     # translate quote fields
     for key, value in quote_fields.items():
         quote[value] = quote.pop(key)
-        if re.match(r'\d+\.\d+', quote[value]):
-            quote[value] = "{:.2f}".format(float(quote[value]))
+        if value == "volume":
+            quote[value] = "{:,}".format(int(quote[value]))
+        # Whole regex match
+        elif len(re.findall(r'[-\d\.]+', quote[value])) == 1:
+            quote[value] = "{:,.2f}".format(float(quote[value]))
+
     return quote
 
 
