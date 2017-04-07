@@ -74,7 +74,7 @@ def get_quote(symbol):
         if value == "volume":
             quote[value] = "{:,}".format(int(quote[value]))
         # Whole regex match
-        elif len(re.findall(r'[-\d\.]+', quote[value])) == 1 and len(re.findall(r'[-\d\.]+', quote[value])[0]) == len(quote[value]):
+        elif len(re.findall(r'[-\d]+\.\d+', quote[value])) == 1 and len(re.findall(r'[-\d]+\.\d+', quote[value])[0]) == len(quote[value]):
             quote[value] = "{:,.2f}".format(float(quote[value]))
 
     return quote
@@ -109,4 +109,10 @@ def get_timesales(symbol, start=None, end=None):
     end = end if end else str(datetime.date.today())
     url = "market/timesales"
     response = make_request(url, {"symbols": symbol})
-    return response['quotes']['quote']
+    sales = response['quotes']['quote']
+    for sale in sales:
+        for key in sale:
+            if key != "date" and len(re.findall(r'[-\d]+\.\d+', sale[key])) == 1 and len(re.findall(r'[-\d]+\.\d+', sale[key])[0]) == len(sale[key]):
+                sale[key] = "{:,.2f}".format(float(sale[key]))
+
+    return sales

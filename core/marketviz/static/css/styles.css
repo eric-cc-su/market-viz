@@ -8,6 +8,10 @@
     color: #5cb85c;
 }
 
+.chart {
+    margin: 0 auto 20px;
+}
+
 h2.quote-price {
     display: inline-block;
     margin-top: 0;

@@ -2,7 +2,7 @@ import json
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from tradeking import get_list, get_quote
+from tradeking import get_list, get_quote, get_timesales
 
 @api_view()
 def index_data(request):
@@ -17,6 +17,8 @@ def index_data(request):
 def quote_view(request):
     data = {}
     if "symbol" in request.GET:
-        response = get_quote(request.GET["symbol"])
-        data = response
+        data = {
+            "quote": get_quote(request.GET["symbol"]),
+            "timesales": get_timesales(request.GET["symbol"])
+        }
     return Response(data)

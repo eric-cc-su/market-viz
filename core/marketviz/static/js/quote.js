@@ -1,6 +1,7 @@
 /**
  * Created by eric on 4/6/17.
  */
+import * as d3 from 'd3';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import QuoteCell from './quotecell'
@@ -9,15 +10,16 @@ import {capitalizePhrase} from './utils'
 class Quote extends Component {
     constructor(props) {
         super(props);
-        this.state = {quote: {}};
+        this.state = {quote: {}, timesales: []};
         this.symbol = props.match.params.symbol;
         this.mountRender = this.mountRender.bind(this);
         this.cellClickHandler = this.cellClickHandler.bind(this);
+        this.renderLineChart = this.renderLineChart.bind(this);
     }
 
     componentDidMount() {
         $.get('/api/quote', {symbol: this.symbol}, function(data) {
-            this.setState({quote: data});
+            this.setState({quote: data.quote, timesales: data.timesales});
             this.mountRender();
         }.bind(this));
     }
@@ -69,7 +71,7 @@ class Quote extends Component {
                                 null
                         } {this.state.quote.change} ({this.state.quote.percent_change}%)</h3>
                 </div>
-                <div className="chart">
+                <div className="col-sm-12 chart">
                 </div>
                 <div>
                     {quote_cells}
@@ -77,6 +79,7 @@ class Quote extends Component {
             </div>
         );
         ReactDOM.render(render_data, document.getElementById('pagecontent'));
+        this.renderLineChart();
     }
 
     render() {
@@ -85,6 +88,58 @@ class Quote extends Component {
                 <div className="loader"></div>
             </div>
         );
+    }
+
+    renderLineChart() {
+        //https://bl.ocks.org/mbostock/3883245
+        d3.select('.chart')
+            .append('svg')
+            .attr('width', 900)
+            .attr('height', 400)
+            .style('display', 'block')
+            .style('margin', '0 auto')
+            .style('border', '1px solid #e9e9e9');
+        var svg = d3.select('svg'),
+            margin = {top: 20, right: 20, bottom: 30, left: 50},
+            width = +svg.attr("width") - margin.left - margin.right,
+            height = +svg.attr("height") - margin.top - margin.bottom,
+            g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S%Z"); //datetime: 2017-04-07T13:30:00Z
+        var x = d3.scaleTime()
+            .rangeRound([0, width]);
+
+        var y = d3.scaleLinear()
+            .rangeRound([height, 0]);
+
+
+        x.domain(d3.extent(this.state.timesales, function(d) { return parseTime(d.datetime); }));
+        var buffer = (0.01 * Math.round(Number(this.state.quote.percent_change))) / 2;
+        console.log("buffer: ", buffer);
+        y.domain([
+            d3.min(this.state.timesales, function(d) {return d.last;}) * (1 - buffer),
+            d3.max(this.state.timesales, function(d) {return d.last;}) * (1 + buffer),
+        ]);
+
+        var line = d3.line()
+            .x(function(d) { return x(parseTime(d.datetime)); })
+            .y(function(d) { return y(d.last); });
+
+        g.append('g').call(d3.axisLeft(y));
+        var xAxis = d3.axisBottom(x);
+        xAxis.ticks(d3.timeHour.every(1))
+            .tickFormat(d3.timeFormat('%H:%M'));
+        g.append('g')
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        g.append("path")
+            .datum(this.state.timesales)
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-width", 1.5)
+            .attr("d", line);
     }
 }
 
