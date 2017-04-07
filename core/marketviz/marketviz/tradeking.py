@@ -1,3 +1,4 @@
+import datetime
 import re
 import requests
 
@@ -15,6 +16,8 @@ def make_request(url_suffix, payload=None, method="GET", format="json"):
                                                  params=payload if method == "GET" else None,
                                                  data=payload if method in ["PUT", "POST"] else None,
                                                  auth=AUTH)
+    if format == "json":
+        return response.json()["response"]
     return response
 
 # https://developers.tradeking.com/documentation/market-ext-quotes-get-post
@@ -64,7 +67,7 @@ def get_quote(symbol):
         }
     url = "market/ext/quotes"
     response = make_request(url, {"symbols": symbol, "fids": ','.join(quote_fields.keys())})
-    quote = response.json()["response"]['quotes']['quote']
+    quote = response.json()['quotes']['quote']
     # translate quote fields
     for key, value in quote_fields.items():
         quote[value] = quote.pop(key)
@@ -81,7 +84,7 @@ def get_quote(symbol):
 def get_list(list):
     url = "market/toplists/" + list
     response = make_request(url)
-    quotes = response.json()["response"]['quotes']['quote']
+    quotes = response.json()['quotes']['quote']
     for quote in quotes:
         quote["change"] = quote.pop("chg")
         direction = "u" if float(quote["change"]) > 0 else "d"
@@ -94,3 +97,16 @@ def get_list(list):
         quote["prior_close"] = quote.pop("pcls")
         quote["volume"] = quote.pop("vl")
     return quotes
+
+# https://developers.tradeking.com/documentation/market-clock-get
+def get_market_clock():
+    url = "market/clock"
+    response = make_request(url)
+    return response
+
+def get_timesales(symbol, start=None, end=None):
+    start = start if start else str(datetime.date.today())
+    end = end if end else str(datetime.date.today())
+    url = "market/timesales"
+    response = make_request(url, {"symbols": symbol})
+    return response['quotes']['quote']
