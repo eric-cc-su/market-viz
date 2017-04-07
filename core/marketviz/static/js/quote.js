@@ -113,7 +113,7 @@ class Quote extends Component {
 
 
         x.domain(d3.extent(this.state.timesales, function(d) { return parseTime(d.datetime); }));
-        var buffer = (0.01 * Math.round(Number(this.state.quote.percent_change))) / 2;
+        var buffer = Math.max(0.005, (0.01 * Math.round(Number(this.state.quote.percent_change))) / 2);
         console.log("buffer: ", buffer);
         y.domain([
             d3.min(this.state.timesales, function(d) {return d.last;}) * (1 - buffer),
@@ -122,7 +122,10 @@ class Quote extends Component {
 
         var line = d3.line()
             .x(function(d) { return x(parseTime(d.datetime)); })
-            .y(function(d) { return y(d.last); });
+            .y(function(d) {
+                return y(d.last);
+            })
+            .curve(d3.curveCardinal.tension(0.5));
 
         g.append('g').call(d3.axisLeft(y));
         var xAxis = d3.axisBottom(x);
@@ -132,14 +135,36 @@ class Quote extends Component {
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis);
 
-        g.append("path")
+        var last_close_data = [
+            [0, this.state.quote.previous_close],
+            [width, this.state.quote.previous_close]
+        ];
+        var previous_close_g = g.append('g');
+        previous_close_g.append('path')
+            .datum(last_close_data)
+            .attr("stroke", "#dddddd")
+            .attr("stroke-dasharray", "10, 5")
+            .attr("stroke-width", 1.5)
+            .attr("d", d3.line()
+                .y(function (d) {
+                    return y(d[1])
+                })
+            );
+
+        previous_close_g.append('text')
+            .attr('fill', '#dddddd')
+            .attr('y', Number(y(this.state.quote.previous_close)) + 16)
+            .text('Previous Close');
+
+        g.append('path')
             .datum(this.state.timesales)
             .attr("fill", "none")
             .attr("stroke", "steelblue")
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")
-            .attr("stroke-width", 1.5)
+            .attr("stroke-width", 2.5)
             .attr("d", line);
+
     }
 }
 
