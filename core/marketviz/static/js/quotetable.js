@@ -2,6 +2,7 @@
  * Created by eric on 4/5/17.
  */
 import React, {Component} from 'react';
+import {capitalizePhrase} from './utils'
 
 class QuoteTable extends Component {
     constructor(props) {
@@ -11,21 +12,18 @@ class QuoteTable extends Component {
             'quotes': props.quotes ? props.quotes : []
         };
         this.name = props.name;
-        this.prepHeader = this.prepHeader.bind(this);
+        this.handleRowClick = this.handleRowClick.bind(this)
     }
 
-    prepHeader(headerstring) {
-        headerstring = headerstring.replace('_', ' ');
-        var new_header = [];
-        headerstring.split(' ').map((substring) =>
-            new_header.push(substring.charAt(0).toUpperCase() + substring.slice(1))
-        );
-        return new_header.join(' ')
+    handleRowClick(e) {
+        e.preventDefault();
+        console.log('click ROW!', e.currentTarget.dataset.symbol);
+        window.location = '/quote/'.concat(e.currentTarget.dataset.symbol);
     }
 
     render() {
         const table_headers = this.state.columns.map((header, index) =>
-            <th key={index}>{this.prepHeader(header)}</th>
+            <th key={index}>{capitalizePhrase(header)}</th>
         );
         var theaders = this.state.columns;
         var table_name = this.name;
@@ -43,8 +41,10 @@ class QuoteTable extends Component {
                     }</td>
                 );
             });
-            table_rows.push(<tr key={table_name + '_r_' + qindex}>{cells}</tr>);
-        });
+            table_rows.push(<tr key={table_name + '_r_' + qindex}
+                                data-symbol={quote['symbol']}
+                                onClick={this.handleRowClick}>{cells}</tr>);
+        }.bind(this));
 
         return (
             <table className={'table table-striped ' + (this.props.class ? this.props.class : '')}>
