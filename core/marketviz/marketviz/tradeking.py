@@ -67,7 +67,7 @@ def get_quote(symbol):
         }
     url = "market/ext/quotes"
     response = make_request(url, {"symbols": symbol, "fids": ','.join(quote_fields.keys())})
-    quote = response.json()['quotes']['quote']
+    quote = response['quotes']['quote']
     # translate quote fields
     for key, value in quote_fields.items():
         quote[value] = quote.pop(key)
@@ -84,7 +84,7 @@ def get_quote(symbol):
 def get_list(list):
     url = "market/toplists/" + list
     response = make_request(url)
-    quotes = response.json()['quotes']['quote']
+    quotes = response['quotes']['quote']
     for quote in quotes:
         quote["change"] = quote.pop("chg")
         direction = "u" if float(quote["change"]) > 0 else "d"
