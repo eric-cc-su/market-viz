@@ -63,11 +63,13 @@ class Quote extends Component {
                     <h1 style={{marginBottom: 0}}>{capitalizePhrase(this.state.quote.name)}</h1>
                     <h2 style={{marginTop: 0}}><small>{this.symbol.toUpperCase()} - {this.state.quote.exchange_desc}</small></h2>
                     <h2 className="quote-price">{this.state.quote.last_trade_price}</h2>
-                    <h3 className={"quote-change" + (direction ? (direction == 1 ? " change-up" : " change-down") : null)}>{
+                    <h3 className={"quote-change" + (direction ? (direction == 1 ? " change-up" : " change-down") : '')}>{
                             (direction) ?
                                 (<i className={"fa fa-arrow-" + (direction == 1 ? "up" : "down")} aria-hidden="true"></i>) :
                                 null
                         } {this.state.quote.change} ({this.state.quote.percent_change}%)</h3>
+                </div>
+                <div className="chart">
                 </div>
                 <div>
                     {quote_cells}
