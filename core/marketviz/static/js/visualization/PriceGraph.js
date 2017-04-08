@@ -20,6 +20,42 @@ class PriceGraph {
         this.width = +this.svg.attr("width") - this.margin.left - this.margin.right;
         this.height = +this.svg.attr("height") - this.margin.top - this.margin.bottom;
         this.g = this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+        this.ybuffer = Math.max(0.005, (0.01 * Math.round(Number(this.quote.percent_change))) / 2);
+        this.drawHorizontalLine = this.drawHorizontalLine.bind(this);
+    }
+
+    drawHorizontalLine(datapoints, attributes) {
+        if (!attributes) {
+            attributes = {
+                "stroke": "#000000",
+                "stroke-width": 1.5
+            }
+        }
+        var y = d3.scaleLinear()
+            .rangeRound([this.height, 0]);
+
+        y.domain([
+            d3.min(this.sales, function (d) {
+                return d.last;
+            }) * (1 - this.ybuffer),
+            d3.max(this.sales, function (d) {
+                return d.last;
+            }) * (1 + this.ybuffer),
+        ]);
+
+        var new_g = this.g.append('g');
+        new_g.append('path')
+            .datum(datapoints)
+            .attr("d", d3.line()
+                .y(function (d) {
+                    return y(d[1])
+                })
+            );
+
+        for (var key in attributes) {
+            new_g.attr(key, attributes[key]);
+        }
+        return new_g;
     }
 
     render() {
@@ -30,18 +66,16 @@ class PriceGraph {
         var y = d3.scaleLinear()
             .rangeRound([this.height, 0]);
 
-
         x.domain(d3.extent(this.sales, function (d) {
             return parseTime(d.datetime);
         }));
-        var buffer = Math.max(0.005, (0.01 * Math.round(Number(this.quote.percent_change))) / 2);
         y.domain([
             d3.min(this.sales, function (d) {
                 return d.last;
-            }) * (1 - buffer),
+            }) * (1 - this.ybuffer),
             d3.max(this.sales, function (d) {
                 return d.last;
-            }) * (1 + buffer),
+            }) * (1 + this.ybuffer),
         ]);
 
         var line = d3.line()
@@ -61,23 +95,17 @@ class PriceGraph {
             .attr("transform", "translate(0," + this.height + ")")
             .call(xAxis);
 
-        var last_close_data = [
+        var line_attributes = {
+            "stroke": "#dddddd",
+            "stroke-dasharray": "10, 5",
+            "stroke-width": 1.5
+        };
+        var line_g = this.drawHorizontalLine([
             [0, this.quote.previous_close],
             [this.width, this.quote.previous_close]
-        ];
-        var previous_close_g = this.g.append('g');
-        previous_close_g.append('path')
-            .datum(last_close_data)
-            .attr("stroke", "#dddddd")
-            .attr("stroke-dasharray", "10, 5")
-            .attr("stroke-width", 1.5)
-            .attr("d", d3.line()
-                .y(function (d) {
-                    return y(d[1])
-                })
-            );
+        ], line_attributes);
 
-        previous_close_g.append('text')
+        line_g.append('text')
             .attr('fill', '#dddddd')
             .attr('x', 10)
             .attr('y', Number(y(this.quote.previous_close)) + 16)
