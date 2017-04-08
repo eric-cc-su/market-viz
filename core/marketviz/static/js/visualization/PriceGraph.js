@@ -20,17 +20,23 @@ class PriceGraph {
         this.width = +this.svg.attr("width") - this.margin.left - this.margin.right;
         this.height = +this.svg.attr("height") - this.margin.top - this.margin.bottom;
         this.g = this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-        this.ybuffer = Math.max(0.005, (0.01 * Math.round(Number(this.quote.percent_change))) / 2);
+        this.ybuffer = Math.max(0.0025, (0.01 * Math.round(Number(this.quote.percent_change))) / 4);
         this.drawHorizontalLine = this.drawHorizontalLine.bind(this);
+        this.toggleHorizontalLine = this.toggleHorizontalLine.bind(this);
     }
 
-    drawHorizontalLine(datapoints, attributes) {
-        if (!attributes) {
-            attributes = {
-                "stroke": "#000000",
-                "stroke-width": 1.5
-            }
+    drawHorizontalLine(yValue, lineText, attributes) {
+        var datapoints = [[0, yValue], [this.width, yValue]];
+        var attrs = {
+            "stroke": "#dddddd",
+            "stroke-dasharray": "10, 5",
+            "stroke-width": 1.5,
+            "name": lineText.toLowerCase().replace(' ', '_')
+        };
+        for (var key in attributes) {
+            attrs[key] = attributes[key];
         }
+
         var y = d3.scaleLinear()
             .rangeRound([this.height, 0]);
 
@@ -52,10 +58,29 @@ class PriceGraph {
                 })
             );
 
-        for (var key in attributes) {
-            new_g.attr(key, attributes[key]);
+        for (var key in attrs) {
+            new_g.attr(key, attrs[key]);
+        }
+
+        if (lineText) {
+            new_g.append('text')
+                .attr('fill', '#dddddd')
+                .attr('x', 10)
+                .attr('y', Number(y(yValue)) + 16)
+                .text(lineText);
         }
         return new_g;
+    }
+
+    toggleHorizontalLine(yValue, lineText, attributes) {
+        var line_name = (attributes && attributes.name) ? attributes.name : lineText.toLowerCase().replace(' ', '_');
+        var line_g = $('g[name="' + line_name + '"]');
+        if (line_g.length > 0) {
+            line_g.remove();
+        }
+        else {
+            return this.drawHorizontalLine(yValue, lineText, attributes);
+        }
     }
 
     render() {
@@ -95,26 +120,12 @@ class PriceGraph {
             .attr("transform", "translate(0," + this.height + ")")
             .call(xAxis);
 
-        var line_attributes = {
-            "stroke": "#dddddd",
-            "stroke-dasharray": "10, 5",
-            "stroke-width": 1.5
-        };
-        var line_g = this.drawHorizontalLine([
-            [0, this.quote.previous_close],
-            [this.width, this.quote.previous_close]
-        ], line_attributes);
-
-        line_g.append('text')
-            .attr('fill', '#dddddd')
-            .attr('x', 10)
-            .attr('y', Number(y(this.quote.previous_close)) + 16)
-            .text('Previous Close');
+        var line_g = this.drawHorizontalLine(this.quote.previous_close, 'Previous Close');
 
         this.g.append('path')
             .datum(this.sales)
             .attr("fill", "none")
-            .attr("stroke", "steelblue")
+            .attr("stroke", "#ff7043")
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")
             .attr("stroke-width", 2.5)
@@ -151,6 +162,7 @@ class PriceGraph {
 
         var dataset = this.sales;
         var margins = this.margin;
+
         function mousemove() {
             var x0 = x.invert(d3.mouse(this)[0]),
                 i = bisectDate(dataset, x0, 1),

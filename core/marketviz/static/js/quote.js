@@ -35,7 +35,15 @@ class Quote extends Component {
 
     cellClickHandler(e) {
         e.preventDefault();
-        console.log("cell click!");
+        var target = e.currentTarget;
+        $(target).toggleClass('active');
+        var price_handlers = ['open', 'low', 'high', 'previous_close', '52wk_high', '52wk_low'];
+
+        // Attribute in priceGraph
+        if (price_handlers.indexOf(target.dataset.name) > -1) {
+            // this.priceGraph.drawHorizontalLine(this.state.quote[target.dataset.name], target.dataset.title);
+            this.priceGraph.toggleHorizontalLine(this.state.quote[target.dataset.name], target.dataset.title);
+        }
     }
 
     mountRender() {
@@ -60,6 +68,7 @@ class Quote extends Component {
         quote_attrs.map((attrs, index) => {
             quote_cells.push(
                 <QuoteCell title={attrs[0]}
+                           name={attrs[1]}
                            data_value={this.state.quote[attrs[1]]}
                            unit={attrs.length > 2 ? attrs[2] : null}
                            onClick={this.cellClickHandler}
@@ -88,9 +97,10 @@ class Quote extends Component {
             </div>
         );
         ReactDOM.render(render_data, document.getElementById('pagecontent'));
-        this.graph = new PriceGraph(this.state.quote, this.state.timesales);
+        $('.quote-cell[data-name="previous_close"]').toggleClass('active');
+        this.priceGraph = new PriceGraph(this.state.quote, this.state.timesales);
         if (this.state.timesales) {
-            this.graph.render();
+            this.priceGraph.render();
         }
     }
 
