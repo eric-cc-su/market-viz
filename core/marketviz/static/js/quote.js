@@ -20,7 +20,17 @@ class Quote extends Component {
         $.get('/api/quote', {symbol: this.symbol}, function(data) {
             this.setState({quote: data.quote, timesales: data.timesales});
             this.mountRender();
-        }.bind(this));
+        }.bind(this))
+            .fail(function(jqxhr, status, error) {
+                var error_element = (
+                    <div>
+                        <h1>{jqxhr.status} {jqxhr.statusText}</h1>
+                        <h2>{jqxhr.responseText}</h2>
+                    </div>
+                );
+                $('.loader').remove();
+                ReactDOM.render(error_element, document.getElementById('pagecontent'));
+            });
     }
 
     cellClickHandler(e) {
