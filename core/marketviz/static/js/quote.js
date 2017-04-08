@@ -14,7 +14,7 @@ class Quote extends Component {
         this.symbol = props.match.params.symbol;
         this.mountRender = this.mountRender.bind(this);
         this.cellClickHandler = this.cellClickHandler.bind(this);
-        this.renderLineChart = this.renderLineChart.bind(this);
+        this.renderPriceChart = this.renderPriceChart.bind(this);
     }
 
     componentDidMount() {
@@ -79,7 +79,7 @@ class Quote extends Component {
             </div>
         );
         ReactDOM.render(render_data, document.getElementById('pagecontent'));
-        this.renderLineChart();
+        this.renderPriceChart();
     }
 
     render() {
@@ -90,7 +90,7 @@ class Quote extends Component {
         );
     }
 
-    renderLineChart() {
+    renderPriceChart() {
         //https://bl.ocks.org/mbostock/3883245
         d3.select('.chart')
             .append('svg')
@@ -114,7 +114,6 @@ class Quote extends Component {
 
         x.domain(d3.extent(this.state.timesales, function(d) { return parseTime(d.datetime); }));
         var buffer = Math.max(0.005, (0.01 * Math.round(Number(this.state.quote.percent_change))) / 2);
-        console.log("buffer: ", buffer);
         y.domain([
             d3.min(this.state.timesales, function(d) {return d.last;}) * (1 - buffer),
             d3.max(this.state.timesales, function(d) {return d.last;}) * (1 + buffer),
@@ -153,6 +152,7 @@ class Quote extends Component {
 
         previous_close_g.append('text')
             .attr('fill', '#dddddd')
+            .attr('x', 10)
             .attr('y', Number(y(this.state.quote.previous_close)) + 16)
             .text('Previous Close');
 
@@ -165,6 +165,40 @@ class Quote extends Component {
             .attr("stroke-width", 2.5)
             .attr("d", line);
 
+        var focus = svg.append("g")
+          .attr("class", "focus")
+          .style("display", "none");
+
+        var bisectDate = d3.bisector(function(d) { return parseTime(d.datetime); }).left;
+
+        focus.append("circle")
+            .attr("r", 4.5);
+
+        focus.append("text")
+            .attr("x", 9)
+            .attr("dy", ".35em");
+
+        svg.append("rect")
+            .attr("width", width - 10)
+            .attr("height", height)
+            .attr("transform", "translate(" + margin.left + ", 0)")
+            .style("fill", "none")
+            .style("pointer-events", "all")
+            .on("mouseover", function () {focus.style("display", null);})
+            .on("mouseout", function () {focus.style("display", "none");})
+            .on("mousemove", mousemove);
+
+        var dataset = this.state.timesales;
+        function mousemove() {
+            var x0 = x.invert(d3.mouse(this)[0]),
+                i = bisectDate(dataset, x0, 1),
+                d0 = dataset[i - 1],
+                d1 = dataset[i],
+                d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
+            // focus.attr("transform", "translate(" + (x(parseTime(d.datetime)) + margin.left) + "," + (y(d.last) + margin.top) + ")");
+            focus.attr("transform", "translate(" + (x(parseTime(d.datetime)) + margin.left) + "," + (y(d.last) + margin.top) + ")");
+            focus.select("text").text(d.last);
+        };
     }
 }
 

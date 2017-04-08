@@ -12,6 +12,11 @@
     margin: 0 auto 20px;
 }
 
+.focus circle {
+  fill: none;
+  stroke: steelblue;
+}
+
 h2.quote-price {
     display: inline-block;
     margin-top: 0;
@@ -35,6 +40,11 @@ h3.quote-change {
     width: 120px;
     height: 120px;
     animation: spin 2s ease infinite;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
 }
 
 .quote-cell {
