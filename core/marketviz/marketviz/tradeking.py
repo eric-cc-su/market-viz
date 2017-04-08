@@ -107,8 +107,17 @@ def get_market_clock():
 def get_timesales(symbol, start=None, end=None):
     start = start if start else str(datetime.date.today())
     end = end if end else str(datetime.date.today())
+    if datetime.time(hour=0, minute=0) <= datetime.datetime.now().time() <= datetime.time(hour=9, minute=30):
+        start = str(datetime.date.today() - datetime.timedelta(days=1))
+        end = str(datetime.date.today() - datetime.timedelta(days=1))
+
     url = "market/timesales"
-    response = make_request(url, {"symbols": symbol})
+    request_data = {
+        "symbols": symbol,
+        "startdate": start,
+        "enddate": end
+    }
+    response = make_request(url, request_data)
     sales = response['quotes']['quote']
     for sale in sales:
         for key in sale:
