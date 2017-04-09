@@ -52,6 +52,10 @@ h3.quote-change {
     cursor: pointer;
 }
 
+.quote-cell[data-name="volume"].active, .quote-cell[data-name="volume"]:hover {
+    background-color: #9cc3e2;
+}
+
 .quote-cell.active, .quote-cell:hover {
     background-color: #ffc3a3;
 }
@@ -59,7 +63,6 @@ h3.quote-change {
 .quote-cell.active small, .quote-cell:hover small {
     color: #555;
 }
-
 
 .quote-cell-title {
     margin-top: 0;

@@ -38,7 +38,6 @@ class Quote extends Component {
     cellClickHandler(e) {
         e.preventDefault();
         var target = e.currentTarget;
-        $(target).toggleClass('active');
         var price_handlers = ['open', 'low', 'high', 'previous_close', '52wk_high', '52wk_low'];
 
         // Attribute in priceGraph
@@ -47,7 +46,8 @@ class Quote extends Component {
         }
         else if (target.dataset.name == 'volume') {
             $('svg').empty();
-            if ($(target).hasClass('active')) {
+            if (! $(target).hasClass('active')) {
+                $('.quote-cell').removeClass('active');
                 if (!this.volumeGraph) {
                     this.volumeGraph = new VolumeGraph(this.state.quote, this.state.timesales);
                 }
@@ -57,6 +57,7 @@ class Quote extends Component {
                 this.priceGraph.refresh();
             }
         }
+        $(target).toggleClass('active');
     }
 
     mountRender() {

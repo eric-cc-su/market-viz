@@ -18,8 +18,12 @@ class PriceGraph {
         this.quote = quote;
         this.sales = sales;
 
-        this.minValue = d3.min(this.sales, function (d) {return d.last;});
-        this.maxValue = d3.max(this.sales, function (d) {return d.last;});
+        this.minValue = d3.min(this.sales, function (d) {
+            return d.last;
+        });
+        this.maxValue = d3.max(this.sales, function (d) {
+            return d.last;
+        });
 
         // Track the horizontal layover lines being used for re-rendering on adjustY
         this.horizontalLines = {};
@@ -131,6 +135,10 @@ class PriceGraph {
         this.render();
         for (var key in this.horizontalLines) {
             this.drawHorizontalLine.apply(this, this.horizontalLines[key]);
+            var quotecell = $('.quote-cell[data-name="' + key + '"]');
+            if (! quotecell.hasClass('active')) {
+                quotecell.addClass('active');
+            }
         }
     }
 
@@ -180,6 +188,12 @@ class PriceGraph {
             .attr("stroke-width", 2.5)
             .attr("d", line)
             .attr("id", "graphline");
+
+        this.svg.append('text')
+            .text('Price')
+            .attr('transform', 'translate(60, 20)')
+            .attr('font-size', '16')
+            .style('fill', 'grey');
 
         this.focus = this.svg.append("g")
             .attr("class", "focus")
