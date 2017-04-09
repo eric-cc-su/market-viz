@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import QuoteCell from './quotecell'
 import {capitalizePhrase} from './utils'
 import PriceGraph from './visualization/PriceGraph'
+import VolumeGraph from './visualization/VolumeGraph'
 
 class Quote extends Component {
     constructor(props) {
@@ -14,6 +15,7 @@ class Quote extends Component {
         this.symbol = props.match.params.symbol;
         this.mountRender = this.mountRender.bind(this);
         this.cellClickHandler = this.cellClickHandler.bind(this);
+        this.activeGraph = 'price';
     }
 
     componentDidMount() {
@@ -41,8 +43,19 @@ class Quote extends Component {
 
         // Attribute in priceGraph
         if (price_handlers.indexOf(target.dataset.name) > -1) {
-            // this.priceGraph.drawHorizontalLine(this.state.quote[target.dataset.name], target.dataset.title);
             this.priceGraph.toggleHorizontalLine(this.state.quote[target.dataset.name], target.dataset.title);
+        }
+        else if (target.dataset.name == 'volume') {
+            $('.chart').empty();
+            if ($(target).hasClass('active')) {
+                if (!this.volumeGraph) {
+                    this.volumeGraph = new VolumeGraph(this.state.quote, this.state.timesales);
+                }
+                this.volumeGraph.render();
+            }
+            else {
+                this.priceGraph.render();
+            }
         }
     }
 

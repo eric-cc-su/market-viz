@@ -130,6 +130,7 @@ def get_market_clock():
     response = make_request(url)
     return response
 
+# https://developers.tradeking.com/documentation/market-timesales-get
 def get_timesales(symbol, start=None, end=None):
     start = start if start else str(datetime.now(EasternTimeZone()).today())
     end = end if end else str(datetime.now(EasternTimeZone()).today())
