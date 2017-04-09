@@ -46,7 +46,7 @@ class Quote extends Component {
             this.priceGraph.toggleHorizontalLine(this.state.quote[target.dataset.name], target.dataset.title);
         }
         else if (target.dataset.name == 'volume') {
-            $('.chart').empty();
+            $('svg').empty();
             if ($(target).hasClass('active')) {
                 if (!this.volumeGraph) {
                     this.volumeGraph = new VolumeGraph(this.state.quote, this.state.timesales);
@@ -54,7 +54,7 @@ class Quote extends Component {
                 this.volumeGraph.render();
             }
             else {
-                this.priceGraph.render();
+                this.priceGraph.refresh();
             }
         }
     }

@@ -6,12 +6,14 @@ import * as d3 from 'd3';
 class PriceGraph {
     constructor(quote, sales) {
         //https://bl.ocks.org/mbostock/3883245
-        d3.select('.chart')
-            .append('svg')
-            .attr('width', 900)
-            .attr('height', 400)
-            .style('display', 'block')
-            .style('margin', '0 auto');
+        if ($('.chart svg').length == 0) {
+            d3.select('.chart')
+                .append('svg')
+                .attr('width', 900)
+                .attr('height', 400)
+                .style('display', 'block')
+                .style('margin', '0 auto');
+        }
 
         this.quote = quote;
         this.sales = sales;
@@ -26,7 +28,6 @@ class PriceGraph {
         this.margin = {top: 20, right: 20, bottom: 30, left: 50};
         this.width = +this.svg.attr("width") - this.margin.left - this.margin.right;
         this.height = +this.svg.attr("height") - this.margin.top - this.margin.bottom;
-        this.g = this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
         this.parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S%Z"); //datetime: 2017-04-07T13:30:00Z
         this.bisectDate = d3.bisector(function (d) {
@@ -54,6 +55,7 @@ class PriceGraph {
         this.adjustY = this.adjustY.bind(this);
         this.toggleHorizontalLine = this.toggleHorizontalLine.bind(this);
         this.mousemove = this.mousemove.bind(this);
+        this.refresh = this.refresh.bind(this);
     }
 
     drawHorizontalLine(yValue, lineText, attributes) {
@@ -119,15 +121,16 @@ class PriceGraph {
                     (this.new_min ? this.new_min : this.minValue) * (1 - this.ybuffer),
                     (this.new_max ? this.new_max : this.maxValue) * (1 + this.ybuffer)
                 ]);
-                this.g.selectAll('g').remove();
-                this.g.selectAll('path').remove();
-                this.svg.selectAll('.focus').remove();
-                this.svg.selectAll('rect').remove();
-                this.render();
-                for (var key in this.horizontalLines) {
-                    this.drawHorizontalLine.apply(this, this.horizontalLines[key]);
-                }
+                $('svg').empty();
+                this.refresh();
             }
+        }
+    }
+
+    refresh() {
+        this.render();
+        for (var key in this.horizontalLines) {
+            this.drawHorizontalLine.apply(this, this.horizontalLines[key]);
         }
     }
 
@@ -147,6 +150,8 @@ class PriceGraph {
     }
 
     render() {
+        this.g = this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
         var line = d3.line()
             .x(function (d) {
                 return this.x(this.parseTime(d.datetime));
