@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import QuoteCell from './quotecell'
 import {capitalizePhrase} from './utils'
+import DividendGraph from './visualization/DividendGraph'
 import PriceGraph from './visualization/PriceGraph'
 import VolumeGraph from './visualization/VolumeGraph'
 
@@ -52,6 +53,19 @@ class Quote extends Component {
                     this.volumeGraph = new VolumeGraph(this.state.quote, this.state.timesales);
                 }
                 this.volumeGraph.render();
+            }
+            else {
+                this.priceGraph.refresh();
+            }
+        }
+        else if (target.dataset.name == 'dividend_yield') {
+            $('svg').empty();
+            if (! $(target).hasClass('active')) {
+                $('.quote-cell').removeClass('active');
+                if (!this.dividendGraph) {
+                    this.dividendGraph = new DividendGraph(this.state.quote);
+                }
+                this.dividendGraph.render();
             }
             else {
                 this.priceGraph.refresh();

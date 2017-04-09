@@ -30,8 +30,8 @@ class PriceGraph {
 
         this.svg = d3.select('svg');
         this.margin = {top: 20, right: 20, bottom: 30, left: 50};
-        this.width = +this.svg.attr("width") - this.margin.left - this.margin.right;
-        this.height = +this.svg.attr("height") - this.margin.top - this.margin.bottom;
+        this.width = 830;
+        this.height = 350;
 
         this.parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S%Z"); //datetime: 2017-04-07T13:30:00Z
         this.bisectDate = d3.bisector(function (d) {
@@ -158,6 +158,9 @@ class PriceGraph {
     }
 
     render() {
+        this.svg.attr('width', 900)
+                .attr('height', 400);
+
         this.g = this.svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
         var line = d3.line()

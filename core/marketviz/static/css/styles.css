@@ -56,6 +56,10 @@ h3.quote-change {
     background-color: #9cc3e2;
 }
 
+.quote-cell[data-name="dividend_yield"].active, .quote-cell[data-name="dividend_yield"]:hover {
+    background-color: #bcbddc;
+}
+
 .quote-cell.active, .quote-cell:hover {
     background-color: #ffc3a3;
 }
