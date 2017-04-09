@@ -16,15 +16,13 @@ class PriceGraph {
         this.quote = quote;
         this.sales = sales;
 
-        this.minValue = d3.min(this.sales, function (d) {
-            return d.last;
-        });
-        this.maxValue = d3.max(this.sales, function (d) {
-            return d.last;
-        });
+        this.minValue = d3.min(this.sales, function (d) {return d.last;});
+        this.maxValue = d3.max(this.sales, function (d) {return d.last;});
+
+        // Track the horizontal layover lines being used for re-rendering on adjustY
+        this.horizontalLines = {};
 
         this.svg = d3.select('svg');
-
         this.margin = {top: 20, right: 20, bottom: 30, left: 50};
         this.width = +this.svg.attr("width") - this.margin.left - this.margin.right;
         this.height = +this.svg.attr("height") - this.margin.top - this.margin.bottom;
@@ -37,8 +35,23 @@ class PriceGraph {
 
         this.ybuffer = Math.max(0.0025, (0.01 * Math.round(Number(this.quote.percent_change))) / 4);
 
+        this.x = d3.scaleTime()
+            .rangeRound([0, this.width]);
+
+        this.y = d3.scaleLinear()
+            .rangeRound([this.height, 0]);
+
+        this.x.domain(d3.extent(this.sales, function (d) {
+            return this.parseTime(d.datetime);
+        }.bind(this)));
+        this.y.domain([
+            this.minValue * (1 - this.ybuffer),
+            this.maxValue * (1 + this.ybuffer),
+        ]);
+
         // methods
         this.drawHorizontalLine = this.drawHorizontalLine.bind(this);
+        this.adjustY = this.adjustY.bind(this);
         this.toggleHorizontalLine = this.toggleHorizontalLine.bind(this);
         this.mousemove = this.mousemove.bind(this);
     }
@@ -54,6 +67,7 @@ class PriceGraph {
         for (var key in attributes) {
             attrs[key] = attributes[key];
         }
+        this.horizontalLines[attrs.name] = [yValue, lineText, attrs];
 
         var new_g = this.g.append('g');
         new_g.append('path')
@@ -78,32 +92,61 @@ class PriceGraph {
         return new_g;
     }
 
+    adjustY(yValue, insert) {
+        // Adjust graph domain to include y point
+        if (yValue) {
+            if (yValue < this.minValue || yValue > this.maxValue) {
+                var new_min = this.minValue;
+                var new_max = this.maxValue;
+                if (insert) {
+                    if (yValue < (this.new_min ? this.new_min : this.minValue)) {
+                        this.new_min = yValue;
+                    }
+                    else if (yValue > (this.new_max ? this.new_max : this.maxValue)) {
+                        this.new_max = yValue;
+                    }
+                }
+                else {
+                    // TODO: readjust axes to next possible new_min/new_max
+                    if (this.new_min && yValue == this.new_min) {
+                        delete this.new_min;
+                    }
+                    else if (this.new_max && yValue == this.new_max) {
+                        delete this.new_max;
+                    }
+                }
+                this.y.domain([
+                    (this.new_min ? this.new_min : this.minValue) * (1 - this.ybuffer),
+                    (this.new_max ? this.new_max : this.maxValue) * (1 + this.ybuffer)
+                ]);
+                this.g.selectAll('g').remove();
+                this.g.selectAll('path').remove();
+                this.svg.selectAll('.focus').remove();
+                this.svg.selectAll('rect').remove();
+                this.render();
+                for (var key in this.horizontalLines) {
+                    this.drawHorizontalLine.apply(this, this.horizontalLines[key]);
+                }
+            }
+        }
+    }
+
     toggleHorizontalLine(yValue, lineText, attributes) {
         var line_name = (attributes && attributes.name) ? attributes.name : lineText.toLowerCase().replace(' ', '_');
         var line_g = $('g[name="' + line_name + '"]');
+
         if (line_g.length > 0) {
             line_g.remove();
+            delete this.horizontalLines[line_name];
+            this.adjustY(yValue, false)
         }
         else {
+            this.adjustY(yValue, true);
             return this.drawHorizontalLine(yValue, lineText, attributes);
         }
     }
 
     render() {
-        this.x = d3.scaleTime()
-            .rangeRound([0, this.width]);
-
-        this.y = d3.scaleLinear()
-            .rangeRound([this.height, 0]);
-
-        this.x.domain(d3.extent(this.sales, function (d) {
-            return this.parseTime(d.datetime);
-        }.bind(this)));
-        this.y.domain([
-            this.minValue * (1 - this.ybuffer),
-            this.maxValue * (1 + this.ybuffer),
-        ]);
-
         var line = d3.line()
             .x(function (d) {
                 return this.x(this.parseTime(d.datetime));
@@ -112,8 +155,7 @@ class PriceGraph {
                 return this.y(d.last);
             }.bind(this))
             .curve(d3.curveCardinal.tension(0.5));
-
-        this.g.append('g').call(d3.axisLeft(this.y));
+        this.g.append('g').call(d3.axisLeft(this.y)).attr('id', 'yaxis');
 
         var xAxis = d3.axisBottom(this.x);
         xAxis.ticks(d3.timeHour.every(1))
@@ -121,9 +163,8 @@ class PriceGraph {
 
         this.g.append('g')
             .attr("transform", "translate(0," + this.height + ")")
-            .call(xAxis);
-
-        var line_g = this.drawHorizontalLine(this.quote.previous_close, 'Previous Close');
+            .call(xAxis)
+            .attr('id', 'xaxis');
 
         this.g.append('path')
             .datum(this.sales)
@@ -132,7 +173,8 @@ class PriceGraph {
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")
             .attr("stroke-width", 2.5)
-            .attr("d", line);
+            .attr("d", line)
+            .attr("id", "graphline");
 
         this.focus = this.svg.append("g")
             .attr("class", "focus")
@@ -157,7 +199,7 @@ class PriceGraph {
             .on("mouseout", function () {
                 this.focus.style("display", "none");
             }.bind(this))
-            .on("mousemove", function() {
+            .on("mousemove", function () {
                 this.mousemove(hover_rect.node());
             }.bind(this));
 

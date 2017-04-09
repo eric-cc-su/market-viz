@@ -2,7 +2,7 @@ import datetime
 import re
 import requests
 
-from datetime import date, datetime, time, timedelta
+from datetime import datetime, time, timedelta
 from requests_oauthlib import OAuth1
 from settings import CONSUMER_KEY, CONSUMER_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET
 from timezone import EasternTimeZone
@@ -23,11 +23,11 @@ def check_market_open():
 def get_last_market_day():
     dt = datetime.now(EasternTimeZone())
     if dt.weekday() > 0 and dt.weekday() < 6:
-        return date.today() - timedelta(days=1)
+        return dt.date() - timedelta(days=1)
     elif dt.weekday() == 0:
-        return date.today() - timedelta(days=3)
+        return dt.date() - timedelta(days=3)
     else:
-        return date.today() - timedelta(days=2)
+        return dt.date() - timedelta(days=2)
 
 def make_request(url_suffix, payload=None, method="GET", format="json"):
     if format == "json":
@@ -131,8 +131,8 @@ def get_market_clock():
     return response
 
 def get_timesales(symbol, start=None, end=None):
-    start = start if start else str(date.today())
-    end = end if end else str(date.today())
+    start = start if start else str(datetime.now(EasternTimeZone()).today())
+    end = end if end else str(datetime.now(EasternTimeZone()).today())
     if not check_market_open():
         last_open = get_last_market_day()
         start = str(last_open)

@@ -101,6 +101,7 @@ class Quote extends Component {
         this.priceGraph = new PriceGraph(this.state.quote, this.state.timesales);
         if (this.state.timesales) {
             this.priceGraph.render();
+            this.priceGraph.drawHorizontalLine(this.state.quote.previous_close, 'Previous Close');
         }
     }
 
