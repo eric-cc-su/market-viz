@@ -100,7 +100,7 @@ class Quote extends Component {
             ['Earnings per Share', 'earnings_per_share'],
             ['Annual Dividend', 'annual_dividend'],
             ['Dividend Yield', 'dividend_yield', '%'],
-            ['Volatility', 'volatility'],
+            // ['Volatility', 'volatility'],
         ];
         var quote_cells = [];
         quote_attrs.map((attrs, index) => {
