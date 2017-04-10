@@ -7,6 +7,7 @@ import QuoteCell from './quotecell'
 import {capitalizePhrase} from './utils'
 import DividendStackedGraph from './visualization/DividendStackedGraph'
 import EPSChart from './visualization/EPSChart'
+import PEChart from './visualization/PEChart'
 import PriceGraph from './visualization/PriceGraph'
 import VolumeGraph from './visualization/VolumeGraph'
 
@@ -68,6 +69,12 @@ class Quote extends Component {
                         this.epsChart = new EPSChart(this.state.quote);
                     }
                     this.epsChart.render();
+                }
+                else if (target.dataset.name == 'price_earnings') {
+                    if (!this.peChart) {
+                        this.peChart = new PEChart(this.state.quote);
+                    }
+                    this.peChart.render();
                 }
             }
             else {

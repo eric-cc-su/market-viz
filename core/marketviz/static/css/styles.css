@@ -79,6 +79,11 @@ h3.quote-change {
     background-color: #ffc3a3;
 }
 
+.quote-cell[data-name="earnings_per_share"].active, .quote-cell[data-name="earnings_per_share"]:hover,
+.quote-cell[data-name="price_earnings"].active, .quote-cell[data-name="price_earnings"]:hover {
+    background-color: #a1d99b;
+}
+
 .quote-cell.active, .quote-cell:hover {
     background-color: #e9e9e9;
 }
