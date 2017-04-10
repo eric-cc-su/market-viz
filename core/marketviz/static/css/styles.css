@@ -8,6 +8,15 @@
     color: #5cb85c;
 }
 
+.chart {
+    margin: 0 auto 20px;
+}
+
+.focus circle {
+  fill: none;
+  stroke: steelblue;
+}
+
 h2.quote-price {
     display: inline-block;
     margin-top: 0;
@@ -33,13 +42,54 @@ h3.quote-change {
     animation: spin 2s ease infinite;
 }
 
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
 .quote-cell {
     border: 1px dashed #e9e9e9;
     cursor: pointer;
 }
 
-.quote-cell:hover {
+.quote-cell[data-name="open"],
+.quote-cell[data-name="low"],
+.quote-cell[data-name="high"],
+.quote-cell[data-name="previous_close"],
+.quote-cell[data-name="52wk_high"],
+.quote-cell[data-name="52wk_low"] {
+    border: 1px dashed #ff7043;
+}
+
+.quote-cell[data-name="volume"].active, .quote-cell[data-name="volume"]:hover {
+    background-color: #9cc3e2;
+}
+
+.quote-cell[data-name="dividend_yield"].active, .quote-cell[data-name="dividend_yield"]:hover,
+.quote-cell[data-name="annual_dividend"].active, .quote-cell[data-name="annual_dividend"]:hover {
+    background-color: #bcbddc;
+}
+
+.quote-cell[data-name="open"].active, .quote-cell[data-name="open"]:hover,
+.quote-cell[data-name="low"].active, .quote-cell[data-name="low"]:hover,
+.quote-cell[data-name="high"].active, .quote-cell[data-name="high"]:hover,
+.quote-cell[data-name="previous_close"].active, .quote-cell[data-name="previous_close"]:hover,
+.quote-cell[data-name="52wk_high"].active, .quote-cell[data-name="52wk_high"]:hover,
+.quote-cell[data-name="52wk_low"].active, .quote-cell[data-name="52wk_low"]:hover {
+    background-color: #ffc3a3;
+}
+
+.quote-cell[data-name="earnings_per_share"].active, .quote-cell[data-name="earnings_per_share"]:hover,
+.quote-cell[data-name="price_earnings"].active, .quote-cell[data-name="price_earnings"]:hover {
+    background-color: #a1d99b;
+}
+
+.quote-cell.active, .quote-cell:hover {
     background-color: #e9e9e9;
+}
+
+.quote-cell.active small, .quote-cell:hover small {
+    color: #555;
 }
 
 .quote-cell-title {

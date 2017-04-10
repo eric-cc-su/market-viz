@@ -7,7 +7,7 @@ Building stock quote visualization using D3, ReactJS and Python2.
 - [D3](https://d3js.org)
 - [ReactJS](https://facebook.github.io/react/)
 - [Tradeking API](https://developers.tradeking.com)
-- [Djang & React](http://gregblogs.com/how-django-reactjs-and-browserify/)
+- [Django & React](http://gregblogs.com/how-django-reactjs-and-browserify/)
 
 ### YQL (Just in Case)
 

@@ -11,7 +11,7 @@ class QuoteCell extends Component {
 
     render() {
         return (
-            <div className="quote-cell col-sm-3" onClick={this.props.onClick}>
+            <div className="quote-cell col-sm-3" onClick={this.props.onClick} data-title={this.props.title} data-name={this.props.name}>
                 <h3 className="quote-cell-title"><small>{this.props.title}</small></h3>
                 <h2>{(this.props.data_value && this.props.data_value != 'na') ? (this.props.data_value + (this.props.unit ? ' '.concat(this.props.unit) : '')) : 'N/A'}</h2>
             </div>

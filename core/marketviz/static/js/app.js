@@ -22,7 +22,7 @@ class App extends Component {
 
     handleSubmit(e) {
         e.preventDefault();
-        this.setState({'search': ''});
+        window.location = '/quote/' + this.state.search;
     }
 
     render() {
@@ -46,7 +46,7 @@ class App extends Component {
                           </ul>
                           <form className="navbar-form navbar-right" onSubmit={this.handleSubmit}>
                             <div className="form-group">
-                              <input type="text" className="form-control" placeholder="Search" onChange={this.handleInputChange} />
+                              <input type="text" className="form-control" placeholder="Ticker Symbol" onChange={this.handleInputChange} />
                             </div>
                             <button type="submit" className="btn btn-default">Submit</button>
                           </form>

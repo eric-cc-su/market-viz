@@ -2,12 +2,32 @@ import datetime
 import re
 import requests
 
+from datetime import datetime, time, timedelta
 from requests_oauthlib import OAuth1
 from settings import CONSUMER_KEY, CONSUMER_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET
+from timezone import EasternTimeZone
 
 AUTH = OAuth1(CONSUMER_KEY, CONSUMER_SECRET,
               OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 API_URL = "https://api.tradeking.com/v1/"
+
+def check_market_open():
+    dt = datetime.now(EasternTimeZone())
+    # Market closed
+    if dt.weekday <= 4 and dt.time() < time(hour=9, minute=30) and dt.time() > time(hour=16):
+        # Double check in case of holidays
+        if get_market_clock()['status']['current'] == 'open':
+            return True
+    return False
+
+def get_last_market_day():
+    dt = datetime.now(EasternTimeZone())
+    if dt.weekday() > 0 and dt.weekday() < 6:
+        return dt.date() - timedelta(days=1)
+    elif dt.weekday() == 0:
+        return dt.date() - timedelta(days=3)
+    else:
+        return dt.date() - timedelta(days=2)
 
 def make_request(url_suffix, payload=None, method="GET", format="json"):
     if format == "json":
@@ -68,13 +88,16 @@ def get_quote(symbol):
     url = "market/ext/quotes"
     response = make_request(url, {"symbols": symbol, "fids": ','.join(quote_fields.keys())})
     quote = response['quotes']['quote']
+    if quote['last'] == '0' and quote['name'].lower() == 'na' and quote['exch'] == 'na':
+        return {}
+
     # translate quote fields
     for key, value in quote_fields.items():
         quote[value] = quote.pop(key)
         if value == "volume":
             quote[value] = "{:,}".format(int(quote[value]))
         # Whole regex match
-        elif len(re.findall(r'[-\d\.]+', quote[value])) == 1 and len(re.findall(r'[-\d\.]+', quote[value])[0]) == len(quote[value]):
+        elif len(re.findall(r'[-\d]+\.\d+', quote[value])) == 1 and len(re.findall(r'[-\d]+\.\d+', quote[value])[0]) == len(quote[value]):
             quote[value] = "{:,.2f}".format(float(quote[value]))
 
     return quote
@@ -82,6 +105,9 @@ def get_quote(symbol):
 
 # https://developers.tradeking.com/documentation/market-toplists-get
 def get_list(list):
+    if not check_market_open():
+        return []
+
     url = "market/toplists/" + list
     response = make_request(url)
     quotes = response['quotes']['quote']
@@ -104,9 +130,26 @@ def get_market_clock():
     response = make_request(url)
     return response
 
+# https://developers.tradeking.com/documentation/market-timesales-get
 def get_timesales(symbol, start=None, end=None):
-    start = start if start else str(datetime.date.today())
-    end = end if end else str(datetime.date.today())
+    start = start if start else str(datetime.now(EasternTimeZone()).today())
+    end = end if end else str(datetime.now(EasternTimeZone()).today())
+    if not check_market_open():
+        last_open = get_last_market_day()
+        start = str(last_open)
+        end = str(last_open)
+
     url = "market/timesales"
-    response = make_request(url, {"symbols": symbol})
-    return response['quotes']['quote']
+    request_data = {
+        "symbols": symbol,
+        "startdate": start,
+        "enddate": end
+    }
+    response = make_request(url, request_data)
+    sales = response['quotes']['quote']
+    for sale in sales:
+        for key in sale:
+            if key != "date" and len(re.findall(r'[-\d]+\.\d+', sale[key])) == 1 and len(re.findall(r'[-\d]+\.\d+', sale[key])[0]) == len(sale[key]):
+                sale[key] = "{:,.2f}".format(float(sale[key]))
+
+    return sales
