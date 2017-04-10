@@ -65,9 +65,8 @@ class Quote extends Component {
                 $('.quote-cell').removeClass('active');
                 if (!this.dividendGraph) {
                     this.dividendGraph = new DividendStackedGraph(this.state.quote, target.dataset.name);
-                    // this.dividendGraph = new DividendRoundGraph(this.state.quote, target.dataset.name);
                 }
-                this.dividendGraph.render(target.dataset.title);
+                this.dividendGraph.render(target.dataset.name);
             }
             else {
                 this.priceGraph.refresh();

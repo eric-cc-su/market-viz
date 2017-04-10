@@ -90,7 +90,7 @@ class VolumeGraph {
 
         this.svg.append('text')
             .text('Volume Traded')
-            .attr('transform', 'translate(60, 20)')
+            .attr('transform', 'translate(400, 20)')
             .attr('font-size', '16')
             .style('fill', 'grey');
 
