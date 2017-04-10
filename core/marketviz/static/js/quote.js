@@ -5,8 +5,8 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import QuoteCell from './quotecell'
 import {capitalizePhrase} from './utils'
-import DividendRoundGraph from './visualization/DividendRoundGraph'
 import DividendStackedGraph from './visualization/DividendStackedGraph'
+import EPSChart from './visualization/EPSChart'
 import PriceGraph from './visualization/PriceGraph'
 import VolumeGraph from './visualization/VolumeGraph'
 
@@ -46,27 +46,29 @@ class Quote extends Component {
         if (price_handlers.indexOf(target.dataset.name) > -1) {
             this.priceGraph.toggleHorizontalLine(this.state.quote[target.dataset.name], target.dataset.title);
         }
-        else if (target.dataset.name == 'volume') {
+        else {
             $('svg').empty();
             if (! $(target).hasClass('active')) {
                 $('.quote-cell').removeClass('active');
-                if (!this.volumeGraph) {
-                    this.volumeGraph = new VolumeGraph(this.state.quote, this.state.timesales);
+
+                if (target.dataset.name == 'volume') {
+                    if (!this.volumeGraph) {
+                        this.volumeGraph = new VolumeGraph(this.state.quote, this.state.timesales);
+                    }
+                    this.volumeGraph.render();
                 }
-                this.volumeGraph.render();
-            }
-            else {
-                this.priceGraph.refresh();
-            }
-        }
-        else if (['annual_dividend', 'dividend_yield'].indexOf(target.dataset.name) > -1) {
-            $('svg').empty();
-            if (! $(target).hasClass('active')) {
-                $('.quote-cell').removeClass('active');
-                if (!this.dividendGraph) {
-                    this.dividendGraph = new DividendStackedGraph(this.state.quote, target.dataset.name);
+                else if (['annual_dividend', 'dividend_yield'].indexOf(target.dataset.name) > -1) {
+                    if (!this.dividendGraph) {
+                        this.dividendGraph = new DividendStackedGraph(this.state.quote, target.dataset.name);
+                    }
+                    this.dividendGraph.render(target.dataset.name);
                 }
-                this.dividendGraph.render(target.dataset.name);
+                else if (target.dataset.name == 'earnings_per_share') {
+                    if (!this.epsChart) {
+                        this.epsChart = new EPSChart(this.state.quote);
+                    }
+                    this.epsChart.render();
+                }
             }
             else {
                 this.priceGraph.refresh();
