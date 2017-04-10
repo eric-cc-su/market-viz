@@ -94,7 +94,7 @@ class VolumeGraph {
             .attr('font-size', '16')
             .style('fill', 'grey');
 
-                this.focus = this.svg.append("g")
+        this.focus = this.svg.append("g")
             .attr("class", "focus")
             .style("display", "none");
 

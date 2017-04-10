@@ -5,7 +5,8 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import QuoteCell from './quotecell'
 import {capitalizePhrase} from './utils'
-import DividendGraph from './visualization/DividendGraph'
+import DividendRoundGraph from './visualization/DividendRoundGraph'
+import DividendStackedGraph from './visualization/DividendStackedGraph'
 import PriceGraph from './visualization/PriceGraph'
 import VolumeGraph from './visualization/VolumeGraph'
 
@@ -58,14 +59,15 @@ class Quote extends Component {
                 this.priceGraph.refresh();
             }
         }
-        else if (target.dataset.name == 'dividend_yield') {
+        else if (['annual_dividend', 'dividend_yield'].indexOf(target.dataset.name) > -1) {
             $('svg').empty();
             if (! $(target).hasClass('active')) {
                 $('.quote-cell').removeClass('active');
                 if (!this.dividendGraph) {
-                    this.dividendGraph = new DividendGraph(this.state.quote);
+                    this.dividendGraph = new DividendStackedGraph(this.state.quote, target.dataset.name);
+                    // this.dividendGraph = new DividendRoundGraph(this.state.quote, target.dataset.name);
                 }
-                this.dividendGraph.render();
+                this.dividendGraph.render(target.dataset.title);
             }
             else {
                 this.priceGraph.refresh();
