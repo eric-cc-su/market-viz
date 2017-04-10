@@ -52,6 +52,15 @@ h3.quote-change {
     cursor: pointer;
 }
 
+.quote-cell[data-name="open"],
+.quote-cell[data-name="low"],
+.quote-cell[data-name="high"],
+.quote-cell[data-name="previous_close"],
+.quote-cell[data-name="52wk_high"],
+.quote-cell[data-name="52wk_low"] {
+    border: 1px dashed #ff7043;
+}
+
 .quote-cell[data-name="volume"].active, .quote-cell[data-name="volume"]:hover {
     background-color: #9cc3e2;
 }
@@ -61,8 +70,17 @@ h3.quote-change {
     background-color: #bcbddc;
 }
 
-.quote-cell.active, .quote-cell:hover {
+.quote-cell[data-name="open"].active, .quote-cell[data-name="open"]:hover,
+.quote-cell[data-name="low"].active, .quote-cell[data-name="low"]:hover,
+.quote-cell[data-name="high"].active, .quote-cell[data-name="high"]:hover,
+.quote-cell[data-name="previous_close"].active, .quote-cell[data-name="previous_close"]:hover,
+.quote-cell[data-name="52wk_high"].active, .quote-cell[data-name="52wk_high"]:hover,
+.quote-cell[data-name="52wk_low"].active, .quote-cell[data-name="52wk_low"]:hover {
     background-color: #ffc3a3;
+}
+
+.quote-cell.active, .quote-cell:hover {
+    background-color: #e9e9e9;
 }
 
 .quote-cell.active small, .quote-cell:hover small {
