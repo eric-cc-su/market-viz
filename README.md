@@ -1,6 +1,8 @@
 Market Viz
 ===
 
+![Screenshot](screenshot0.png)
+
 Building stock quote visualization using D3, ReactJS and Python2.
 
 - [Django](https://www.djangoproject.com/)
